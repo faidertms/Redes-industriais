@@ -22,7 +22,8 @@ String esperarMensagemDoMestre(){//string
     return str;
   }
 }
-
+String criptografiaHomophonic(){
+}
 void pararGarrafa(){
   enviarEstadoTrabalhando();
 }
