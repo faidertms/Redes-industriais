@@ -1,11 +1,17 @@
-void setup() {
-  Serial.begin(9600);
- }
+
+//-------------------------------INICIALIZAÇÃO--------------------------------------------\\
+
 unsigned long tempo;
 char alfa[] = "abcdefghijklmnopqrstuvwxyz";
 char cripts[][27] = {{'8','F','H','G','3','l','1','L','E','I','w','o','M','X','6','Q','P','b','V','9','a','Z','S','D','j','r'},{'z','-','k','m','x','n','B','u','0','-','-','O','A','v','5','p','-','R','y','f','4','g','-','-','-','-'},{'K','-','s','N','q','-','-','-','J','-','-','a','c','-','2','-','-','T','e','Y','h','-','-','-','-','-'},{'7','-','-','-','t','-','-','-','-','-','-','-','-','-','W','-','-','C','-','-','-','-','-','-','-','-'},{'i','-','-','-','-','-','-','-','-','-','-','-','-','-','d','-','-','-','-','-','-','-','-','-','-','-','-'}};  
 String mensagemNova;
 bool recebeu = false;
+
+void setup() {
+  Serial.begin(9600);
+ }
+
+//-------------------------------MENSAGENS-SERIAL--------------------------------------------\\
 
 void enviarEstadoLivre(){
   enviarMensagem("Livre");
@@ -30,21 +36,31 @@ void esperarMensagemDoMestre(){//string
     tempo = millis();
   }
 }
+void limparMensagem(){
+    mensagemNova=""; // momentaneo
+    recebeu = false;
+}
+
+//-------------------------------PROCESSOS--------------------------------------------\\
 
 void pararGarrafa(){
-  enviarEstadoTrabalhando();
+  //procura a garrafa com algum sensor, se chegar..
+  if("chego" == "chego"){ // temporario
+    enviarEstadoTrabalhando();
+  }else{
+    enviarEstadoLivre();
+  }
+  
 }
 void tamparGarrafa(){
-  
   //ações
   enviarEstadoTerminado();
 }
 void liberarGarrafa(){
-  esperarMensagemDoMestre();
   //libera garrafa
-
   enviarEstadoLivre();
 }
+//-------------------------------CRIPTOGRAFIA--------------------------------------------\\
 
 String descripto(String mensagemCripto ){
   String mensagem;
@@ -84,22 +100,21 @@ String cripto(String mensagem){
   return mensagemCripto;
 }
 
-
+//-------------------------------LOOP-PRINCIPAL--------------------------------------------\\
 
 void loop() {
   esperarMensagemDoMestre();
-  if(strcmp(mensagemNova.c_str(),"comecar") == 0){
-    mensagemNova=""; // momentaneo
+  if(strcmp(mensagemNova.c_str(),"comecar") == 0){//proceso 1
+    limparMensagem();
+    pararGarrafa();
+    tamparGarrafa();
     enviarMensagem("teste");
-    delay(1500);
-  }else if(strcmp(mensagemNova.c_str(),"liberar") == 0){
-    mensagemNova=""; // momentaneo
+  }else if(strcmp(mensagemNova.c_str(),"liberar") == 0){ // processo 2
+    limparMensagem();
+    liberarGarrafa();
     enviarMensagem("thiago");
-   delay(1500);
   }
-  
-  if(recebeu & ((millis()-tempo) == 1000)){
-    mensagemNova=""; // momentaneo
+  if(recebeu & ((millis()-tempo) == 1000)){ // Limpeza caso mensagem venha errado
+    limparMensagem(); 
   }
 }
-  // if(esperarMensagemDoMestre()== "Começar"){pararGarrafa()tamparGarrafa()liberarGarrafa()}
