@@ -1,6 +1,5 @@
 
 //-------------------------------INICIALIZAÇÃO--------------------------------------------\\
-
 unsigned long tempo;
 char alfa[] = "abcdefghijklmnopqrstuvwxyz";
 char cripts[][27] = {{'8','F','H','G','3','l','1','L','E','I','w','o','M','X','6','Q','P','b','V','9','a','Z','S','D','j','r'},
@@ -11,8 +10,16 @@ char cripts[][27] = {{'8','F','H','G','3','l','1','L','E','I','w','o','M','X','6
 String mensagemNova;
 bool recebeu = false;
 
+int relay = 8;
+Servo servo1;
+Servo servo2;
+
+
 void setup() {
   Serial.begin(9600);
+  pinMode(relay, OUTPUT); // motor 
+  servo1.attach(6); // 
+  servo2.attach(5); //
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
@@ -108,22 +115,22 @@ String cripto(String mensagem){
 //-------------------------------PROCESSOS--------------------------------------------\\
 
 void pararGarrafa(){
-  //procura a garrafa com algum sensor, se chegar..
-  //if("chego" == "chego"){ // temporario
+    // tem que ter um sensor aqui...
+    servo1.write(50);//ajustar os graus para segurar a garrafa
     enviarEstadoTrabalhando();
-  /*}else{
-    enviarEstadoLivre();
-  }*/
-  
 }
 void tamparGarrafa(){
-  //ações
-  delay(5000);
+  servo2.write(50);// soltar tampa
+  delay(1000);//tempo ncessario pra soltar
+  servo2.write(0); // fecha
+  //delay(5000);
+  digitalWrite(relay, HIGH);// começa a tampar
+  delay(1000);//tempo para tampar
+  digitalWrite(relay, LOW);// desligar o motor que tampa
   enviarEstadoTerminado();
 }
 void liberarGarrafa(){
-  //libera garrafa
-  delay(5000);
+  servo1.write(0);//ajustar os graus para liberar a garrafa
   enviarEstadoLivre();
 }
 //-------------------------------LOOP-PRINCIPAL--------------------------------------------\\
@@ -134,11 +141,9 @@ void loop() {
     limparMensagem();
     pararGarrafa();
     tamparGarrafa();
-   // enviarMensagem("teste");
   }else if(strcmp(mensagemNova.c_str(),"liberar") == 0){ // processo 2
     limparMensagem();
     liberarGarrafa();
-    //enviarMensagem("thiago");
   }
   if(recebeu & ((millis()-tempo) == 1000)){ // Limpeza caso mensagem venha errado
     limparMensagem(); 
